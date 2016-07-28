@@ -1,5 +1,5 @@
 /**
- * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
+ * Copyright &copy; 2012-2016 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
  */
 package com.thinkgem.jeesite.common.persistence.interceptor;
 
@@ -180,7 +180,8 @@ public class SQLHelper {
      * @param hql 
      * @return 
      */  
-    private static String removeOrders(String qlString) {  
+    @SuppressWarnings("unused")
+	private static String removeOrders(String qlString) {  
         Pattern p = Pattern.compile("order\\s*by[\\w|\\W|\\s|\\S]*", Pattern.CASE_INSENSITIVE);  
         Matcher m = p.matcher(qlString);  
         StringBuffer sb = new StringBuffer();  
