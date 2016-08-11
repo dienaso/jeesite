@@ -98,6 +98,7 @@ public abstract class BaseService {
 			}
 		}
 		if (StringUtils.isNotBlank(sqlString.toString())){
+			System.out.println("sssssssssssssssssssss:"+ "AND (" + sqlString.substring(4) + ")");
 			return " AND (" + sqlString.substring(4) + ")";
 		}
 		return "";

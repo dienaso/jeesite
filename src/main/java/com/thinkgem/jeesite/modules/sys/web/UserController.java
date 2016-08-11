@@ -3,6 +3,7 @@
  */
 package com.thinkgem.jeesite.modules.sys.web;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -200,6 +201,8 @@ public class UserController extends BaseController {
 					if ("true".equals(checkLoginName("", user.getLoginName()))){
 						user.setPassword(SystemService.entryptPassword("123456"));
 						BeanValidators.validateWithException(validator, user);
+						double  mobile = Double.parseDouble(user.getMobile());
+						user.setMobile(new DecimalFormat("#").format(mobile));// 解决取值后会带一个E的问题   
 						systemService.saveUser(user);
 						successNum++;
 					}else{

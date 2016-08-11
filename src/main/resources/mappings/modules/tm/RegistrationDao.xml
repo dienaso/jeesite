@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.tm.dao.RegistrationDao">
+    
+	<sql id="registrationColumns">
+		a.*,
+		u.id AS "createBy.id",
+		u.name AS "createBy.name",
+		o.id AS "createBy.office.id",
+		o.name AS "createBy.office.name"
+	</sql>
+	
+	<sql id="registrationJoins">
+		JOIN sys_user u ON u.id = a.create_by
+		JOIN sys_office o ON o.id = u.office_id
+	</sql>
+    
+	<select id="get" resultType="Registration">
+		SELECT 
+			<include refid="registrationColumns"/>
+		FROM tm_registration a
+		<include refid="registrationJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Registration">
+		SELECT 
+			<include refid="registrationColumns"/>
+		FROM tm_registration a
+		<include refid="registrationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<!-- 数据范围过滤 -->
+			${sqlMap.dsf}
+			<if test="reportNo != null and reportNo != ''">
+				AND a.report_no = #{reportNo}
+			</if>
+			<if test="applicantCn != null and applicantCn != ''">
+				AND a.applicant_cn LIKE 
+					<if test="dbName == 'oracle'">'%'||#{applicantCn}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{applicantCn}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{applicantCn},'%')</if>
+			</if>
+			<if test="tmName != null and tmName != ''">
+				AND a.tm_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{tmName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{tmName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{tmName},'%')</if>
+			</if>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Registration">
+		SELECT 
+			<include refid="registrationColumns"/>
+		FROM tm_registration a
+		<include refid="registrationJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tm_registration(
+			id,
+			report_no,
+			applicant_cn,
+			business_type,
+			int_cls,
+			tm_name,
+			gen_times,
+			tm_img,
+			safe,
+			balance,
+			radical,
+			pages,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag
+		) VALUES (
+			#{id},
+			(SELECT CONCAT(DATE_FORMAT(CURDATE(),'%Y%m%d'),LPAD(SUBSTRING(MAX(report_no), 9)+1,4,'0'))  FROM (select * from tm_registration)  as tmp),
+			#{applicantCn},
+			#{businessType},
+			#{intCls},
+			#{tmName},
+			0,
+			#{tmImg},
+			#{safe},
+			#{balance},
+			#{radical},
+			0,
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tm_registration SET 	
+			report_no = #{reportNo},
+			applicant_cn = #{applicantCn},
+			business_type = #{businessType},
+			int_cls = #{intCls},
+			tm_name = #{tmName},
+			gen_times = #{genTimes},
+			tm_img = #{tmImg},
+			safe = #{safe},
+			balance = #{balance},
+			radical = #{radical},
+			pages = #{pages},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tm_registration SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateGenTimes">
+		UPDATE tm_registration SET 
+			gen_times = gen_times + 1
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updatePages">
+		UPDATE tm_registration SET 
+			pages = #{pages}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

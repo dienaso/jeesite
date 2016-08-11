@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.tm.dao.SimilarDao">
+    
+	<sql id="similarColumns">
+		a.id AS "id",
+		a.tm_registration_id AS "tm_registration.id",
+		a.tm_name AS "tmName",
+		a.tm_img AS "tmImg",
+		a.current_status AS "currentStatus",
+		a.int_cls AS "intCls",
+		a.applicant_cn AS "applicantCn",
+		a.reg_no AS "regNo",
+		a.agent AS "agent",
+		a.similarity AS "similarity",
+		a.advise AS "advise",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="similarJoins">
+		LEFT JOIN tm_registration b ON b.id = a.tm_registration_id
+	</sql>
+    
+	<select id="get" resultType="Similar">
+		SELECT 
+			<include refid="similarColumns"/>
+		FROM tm_similar a
+		<include refid="similarJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="Similar">
+		SELECT 
+			<include refid="similarColumns"/>
+		FROM tm_similar a
+		<include refid="similarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="tm_registration != null and tm_registration.id != null and tm_registration.id != ''">
+				AND a.tm_registration_id = #{tm_registration.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.int_cls ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="Similar">
+		SELECT 
+			<include refid="similarColumns"/>
+		FROM tm_similar a
+		<include refid="similarJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.int_cls ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tm_similar(
+			id,
+			tm_registration_id,
+			tm_name,
+			tm_img,
+			current_status,
+			int_cls,
+			applicant_cn,
+			reg_no,
+			agent,
+			similarity,
+			advise,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{tm_registration.id},
+			#{tmName},
+			#{tmImg},
+			#{currentStatus},
+			#{intCls},
+			#{applicantCn},
+			#{regNo},
+			#{agent},
+			#{similarity},
+			#{advise},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tm_similar SET 	
+			tm_name = #{tmName},
+			tm_img = #{tmImg},
+			current_status = #{currentStatus},
+			int_cls = #{intCls},
+			applicant_cn = #{applicantCn},
+			reg_no = #{regNo},
+			agent = #{agent},
+			similarity = #{similarity},
+			advise = #{advise}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tm_similar SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE tm_registration_id = #{tm_registration.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

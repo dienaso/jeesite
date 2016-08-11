@@ -12,8 +12,8 @@ call compressor\compressor.bat jquery-select2\3.4\select2.css
 call compressor\compressor.bat jquery-select2\3.4\select2.js
 call compressor\compressor.bat jquery-jbox\2.3\Skins\Bootstrap\jbox.css
 call compressor\compressor.bat jquery-jbox\2.3\jquery.jBox-2.3.js
-call compressor\compressor.bat jquery-validation\1.11.0\jquery.validate.css
-call compressor\compressor.bat jquery-validation\1.11.0\jquery.validate.js
+call compressor\compressor.bat jquery-validation\1.11.1\jquery.validate.css
+call compressor\compressor.bat jquery-validation\1.11.1\jquery.validate.js
 call compressor\compressor.bat jquery-ztree\3.5.12\css\zTreeStyle\zTreeStyle.css
 rem call compressor\compressor.bat jerichotab\css\jquery.jerichotab.css
 rem call compressor\compressor.bat jerichotab\js\jquery.jerichotab.js
