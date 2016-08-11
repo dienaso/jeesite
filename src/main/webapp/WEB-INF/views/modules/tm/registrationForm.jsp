@@ -209,8 +209,8 @@
 									alert(data.msg);
 								}
 								if(data.allRecords == 0){
-									alert('未找到相似商标!');
 									closeLoading();
+									alert('未找到相似商标!');
 									return;
 								}
 								$.each(data.results, function(i, item) {
