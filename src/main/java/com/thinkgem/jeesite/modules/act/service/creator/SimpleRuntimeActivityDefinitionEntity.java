@@ -42,6 +42,7 @@ public class SimpleRuntimeActivityDefinitionEntity implements RuntimeActivityDef
 
 	String _propertiesText;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void deserializeProperties() throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -68,6 +69,7 @@ public class SimpleRuntimeActivityDefinitionEntity implements RuntimeActivityDef
 		return _propertiesText;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getProperty(String name) {
 		return (T) _properties.get(name);

@@ -288,6 +288,7 @@ public class UserController extends BaseController {
 			currentUser.setMobile(user.getMobile());
 			currentUser.setRemarks(user.getRemarks());
 			currentUser.setPhoto(user.getPhoto());
+			currentUser.setWxQrCode(user.getWxQrCode());
 			systemService.updateUserInfo(currentUser);
 			model.addAttribute("message", "保存用户信息成功");
 		}

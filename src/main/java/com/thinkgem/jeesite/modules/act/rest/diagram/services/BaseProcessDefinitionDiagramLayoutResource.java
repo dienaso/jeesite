@@ -330,6 +330,7 @@ public class BaseProcessDefinitionDiagramLayoutResource {
 				ActivityImpl act = (ActivityImpl) properties.get(key);
 				propertiesJSON.put(key, act.getId());
 			} else if ("timerDeclarations".equals(key)) {
+				@SuppressWarnings("unchecked")
 				ArrayList<TimerDeclarationImpl> timerDeclarations = (ArrayList<TimerDeclarationImpl>) properties.get(key);
 				ArrayNode timerDeclarationArray = new ObjectMapper().createArrayNode();
 
@@ -352,6 +353,7 @@ public class BaseProcessDefinitionDiagramLayoutResource {
 					propertiesJSON.put(key, timerDeclarationArray);
 				// TODO: implement getting description
 			} else if ("eventDefinitions".equals(key)) {
+				@SuppressWarnings("unchecked")
 				ArrayList<EventSubscriptionDeclaration> eventDefinitions = (ArrayList<EventSubscriptionDeclaration>) properties.get(key);
 				ArrayNode eventDefinitionsArray = new ObjectMapper().createArrayNode();
 
@@ -375,6 +377,7 @@ public class BaseProcessDefinitionDiagramLayoutResource {
 
 				// TODO: implement it
 			} else if ("errorEventDefinitions".equals(key)) {
+				@SuppressWarnings("unchecked")
 				ArrayList<ErrorEventDefinition> errorEventDefinitions = (ArrayList<ErrorEventDefinition>) properties.get(key);
 				ArrayNode errorEventDefinitionsArray = new ObjectMapper().createArrayNode();
 

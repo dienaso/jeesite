@@ -90,6 +90,38 @@
 					uploadPath="/tm/registration" />
 			</div>
 		</div>
+
+		<div class="control-group">
+			<label class="control-label">查询类型:</label>
+			<div class="controls">
+				<form:radiobuttons path="tmSt" items="${fns:getDictList('tm_st')}"
+					itemLabel="label" itemValue="value" htmlEscape="false"
+					class="required" />
+			</div>
+		</div>
+
+		<div id="tm_sc_zh" class="control-group">
+			<label class="control-label">查询条件：</label>
+			<div class="controls">
+				<form:checkboxes path="tmScList"
+					items="${fns:getDictList('tm_sc_zh')}" itemLabel="label"
+					itemValue="value" htmlEscape="false" class="required" />
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		
+		<div id="tm_sc_en" class="control-group">
+			<label class="control-label">查询条件：</label>
+			<div class="controls">
+				<form:checkboxes path="tmScList"
+					items="${fns:getDictList('tm_sc_en')}" itemLabel="label"
+					itemValue="value" htmlEscape="false" class="required" />
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+
+	
+
 		<div class="control-group">
 			<label class="control-label">注册类别：</label>
 			<div class="controls">
@@ -107,6 +139,11 @@
 					itemValue="value" htmlEscape="false" class="required" />
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
+		</div>
+		<div class="form-actions">
+			<shiro:hasPermission name="tm:registration:searchTm">
+				<input id="btnSearch" class="btn" onclick="searchTm();"
+					value="查询相似商标" />&nbsp;</shiro:hasPermission>
 		</div>
 		<div class="control-group">
 			<label class="control-label">相似商标：</label>
@@ -162,12 +199,11 @@
 								<input id="similarList{{idx}}_agent" name="similarList[{{idx}}].agent" type="text" value="{{row.agent}}" class="input-large " readonly />
 							</td>
 							<td>
-								<input id="similarList{{idx}}_similarity" name="similarList[{{idx}}].similarity" type="text" value="{{row.similarity}}" max=100 class="input-mini required"/>
+								<input id="similarList{{idx}}_similarity" name="similarList[{{idx}}].similarity" type="text" value="{{row.similarity}}" max=100 class="input-mini"/>
 								<span class="help-inline"><font color="red">%</font> </span>
 							</td>
 							<td>
-								<textarea id="similarList{{idx}}_advise" name="similarList[{{idx}}].advise" rows="2" maxlength="300" class="input-large required">{{row.advise}}</textarea>
-								<span class="help-inline"><font color="red">*</font> </span>
+								<textarea id="similarList{{idx}}_advise" name="similarList[{{idx}}].advise" rows="2" maxlength="300" class="input-large">{{row.advise}}</textarea>
 							</td>
 							<shiro:hasPermission name="tm:registration:edit"><td class="text-center" width="10">
 								{{#delBtn}}<span class="close" onclick="delRow(this, '#similarList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
@@ -175,86 +211,216 @@
 						</tr>//-->
 					</script>
 				<script type="text/javascript">
-						var similarRowIdx = 0, similarTpl = $("#similarTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");
-						$(document).ready(function() {
-							var data = ${fns:toJson(registration.similarList)};
-							for (var i=0; i<data.length; i++){
-								addRow('#similarList', similarRowIdx, similarTpl, data[i]);
-								similarRowIdx = similarRowIdx + 1;
+					var similarRowIdx = 0, similarTpl = $("#similarTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");
+					$(document).ready(function() {
+						var data = ${fns:toJson(registration.similarList)};
+						for (var i=0; i<data.length; i++){
+							addRow('#similarList', similarRowIdx, similarTpl, data[i]);
+							similarRowIdx = similarRowIdx + 1;
+						}
+						
+						var price = parseInt(${fns:getConfig('tm.tmkoo.price')});
+						var urgentPrice = price + parseInt(${fns:getConfig('tm.tmkoo.raisePrice')});
+						//var tmSc = ${registration.tmSc};
+						
+						tmStInit(${registration.tmSt}, 'init');
+						
+						//初始化查询类型
+						function tmStInit(tmSt, opt){
+							if(tmSt==1){
+								$('#tm_sc_en').children().find(':checkbox').each(function(){
+									$(this).attr("checked",false);
+								});
+								$('#tm_sc_zh').children().find(':checkbox').each(function(){
+									if(opt == 'click'){
+										$(this).attr("checked",true);
+									}
+								});
+								$('#tm_sc_en').hide();
+								$('#tm_sc_zh').show();
+							}else{
+								$('#tm_sc_en').children().find(':checkbox').each(function(){
+									if(opt == 'click'){
+										$(this).attr("checked",true);
+									}
+								});
+								$('#tm_sc_zh').children().find(':checkbox').each(function(){
+									$(this).attr("checked",false);
+								});
+								//隐藏中文查询条件
+								$('#tm_sc_zh').hide();
+								$('#tm_sc_en').show();
 							}
+						}
+						
+						//选择查询类型
+						$('input[name="tmSt"]').click(function(){ 
+							tmStInit($(this).val(),'click');
 						});
-									
-						function searchTm() {
-							//删除全部已查询相似商标
-							$("input[id$='delFlag']").each(function(obj){  
-								$("#similarList"+obj+"_delFlag").val("1");
-								$("#similarList"+obj+"_delFlag").parent().parent().addClass("control-group hide");
-							});  
-							
-							//获取选中的注册类别
-							var cls =[]; 
-							$('input[name="intClsList"]:checked').each(function(){ 
-								cls.push($(this).val()); 
+						
+						//计算价格
+						$('input[name="recNormalList"]').click(function(){ 
+							var num = 0;
+							$('input[name="recNormalList"]:checked').each(function(){ 
+								num++;
 							}); 
-							var searchKey = $('input[name="tmName"]').val();
-							if(searchKey == '' || cls.length == 0){
-								alert("请填写注册类别和商标名称");
+							$('input[name="recNormalTotalPrice"]').val(price*num);
+							//$('input[name="recNormalDiscountPrice"]').val(price*num);
+						}); 
+						
+						$('input[name="recUrgentList"]').click(function(){ 
+							var num = 0;
+							$('input[name="recUrgentList"]:checked').each(function(){ 
+								num++;
+							}); 
+							$('input[name="recUrgentTotalPrice"]').val(urgentPrice*num);
+							//$('input[name="recUrgentDiscountPrice"]').val(urgentPrice*num);
+						}); 
+						
+						$('input[name="extNormalList"]').click(function(){ 
+							var num = 0;
+							$('input[name="extNormalList"]:checked').each(function(){ 
+								num++;
+							}); 
+							$('input[name="extNormalTotalPrice"]').val(price*num);
+							//$('input[name="extNormalDiscountPrice"]').val(price*num);
+						}); 
+						
+						$('input[name="extUrgentList"]').click(function(){ 
+							var num = 0;
+							$('input[name="extUrgentList"]:checked').each(function(){ 
+								num++;
+							}); 
+							$('input[name="extUrgentTotalPrice"]').val(urgentPrice*num);
+							//$('input[name="extUrgentDiscountPrice"]').val(urgentPrice*num);
+						}); 
+						
+					});
+								
+					function searchTm() {
+						//删除全部已查询相似商标
+						$("input[id$='delFlag']").each(function(obj){  
+							$("#similarList"+obj+"_delFlag").val("1");
+							$("#similarList"+obj+"_delFlag").parent().parent().addClass("control-group hide");
+						});  
+						
+						//获取选中的注册类别
+						var cls =[]; 
+						$('input[name="intClsList"]:checked').each(function(){ 
+							cls.push($(this).val()); 
+						}); 
+						var searchKey = $('input[name="tmName"]').val();
+						//获取选中的查询类型
+						var st = $('input[name="tmSt"]:checked').val();
+						//获取选中的查询条件
+						var sc =[]; 
+						$('input[name="tmScList"]:checked').each(function(){ 
+							sc.push($(this).val()); 
+						}); 
+						
+						if(searchKey == '' || cls.length == 0 || sc.length == 0){
+							alertx('请填写商标名称、查询条件和注册类别!');
+							return;
+						}
+						//$.ajaxSettings.async = false; 
+						loading('查询中，请稍等...');
+						$.getJSON("${ctx}/tm/registration/searchTm",{st:st,sc:sc.join(','),intCls:cls.join(';'),searchKey:searchKey},function(data){
+							if(data.remainCount == 0){
+								closeLoading();
+								alertx(data.msg);
 								return;
 							}
-							//$.ajaxSettings.async = false; 
-							loading('查询中，请稍等...');
-							$.getJSON("${ctx}/tm/registration/searchTm",{intCls:cls.join(';'),searchKey:searchKey},function(data){
-								if(data.remainCount == 0){
-									closeLoading();
-									alert(data.msg);
-								}
-								if(data.allRecords == 0){
-									closeLoading();
-									alert('未找到相似商标!');
-									return;
-								}
-								$.each(data.results, function(i, item) {
-									addRow('#similarList', similarRowIdx, similarTpl, item);
-									similarRowIdx = similarRowIdx + 1;
-						        });
+							if(data.allRecords == 0){
 								closeLoading();
-							});
-									
-						}
-					</script>
+								alertx('未找到相似商标!');
+								return;
+							}
+							$.each(data.results, function(i, item) {
+								addRow('#similarList', similarRowIdx, similarTpl, item);
+								similarRowIdx = similarRowIdx + 1;
+					        });
+							closeLoading();
+						});
+								
+					}
+				</script>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label">稳健型：</label>
+		<div class="control-group bs-docs-rec">
+			<label class="control-label">普通注册(<font color="red">推荐类别</font>)：</label>
 			<div class="controls">
-				<form:checkboxes path="safeList"
+				<form:checkboxes path="recNormalList"
 					items="${fns:getDictList('tm_category')}" itemLabel="label"
 					itemValue="value" htmlEscape="false" class="required" />
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">平衡型：</label>
+
 			<div class="controls">
-				<form:checkboxes path="balanceList"
+				<label><font color="red">总价：</font></label>
+				<form:input path="recNormalTotalPrice" htmlEscape="false"
+					maxlength="100" class="required input-mini" readonly="true" />
+
+				<label><font color="red">活动价：</font></label>
+				<form:input path="recNormalDiscountPrice" htmlEscape="false"
+					maxlength="100" class="input-mini" />
+			</div>
+
+			<label class="control-label">加急注册(<font color="red">推荐类别</font>)：</label>
+			<div class="controls">
+				<form:checkboxes path="recUrgentList"
 					items="${fns:getDictList('tm_category')}" itemLabel="label"
 					itemValue="value" htmlEscape="false" class="required" />
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
+
+			<div class="controls">
+				<label><font color="red">总价：</font></label>
+				<form:input path="recUrgentTotalPrice" htmlEscape="false"
+					maxlength="100" class="required input-mini" readonly="true" />
+
+				<label><font color="red">活动价：</font></label>
+				<form:input path="recUrgentDiscountPrice" htmlEscape="false"
+					maxlength="100" class="input-mini" />
+			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">冲击型：</label>
+			<label class="control-label">普通注册(<font color="red">拓展类别</font>)：</label>
 			<div class="controls">
-				<form:checkboxes path="radicalList"
+				<form:checkboxes path="extNormalList"
 					items="${fns:getDictList('tm_category')}" itemLabel="label"
 					itemValue="value" htmlEscape="false" class="required" />
 				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+
+			<div class="controls">
+				<label><font color="red">总价：</font></label>
+				<form:input path="extNormalTotalPrice" htmlEscape="false"
+					maxlength="100" class="required input-mini" readonly="true" />
+
+				<label><font color="red">活动价：</font></label>
+				<form:input path="extNormalDiscountPrice" htmlEscape="false"
+					maxlength="100" class="input-mini" />
+			</div>
+
+			<label class="control-label">加急注册(<font color="red">拓展类别</font>)：</label>
+			<div class="controls">
+				<form:checkboxes path="extUrgentList"
+					items="${fns:getDictList('tm_category')}" itemLabel="label"
+					itemValue="value" htmlEscape="false" class="required" />
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+
+			<div class="controls">
+				<label><font color="red">总价：</font></label>
+				<form:input path="extUrgentTotalPrice" htmlEscape="false"
+					maxlength="100" class="required input-mini" readonly="true" />
+
+				<label><font color="red">活动价：</font></label>
+				<form:input path="extUrgentDiscountPrice" htmlEscape="false"
+					maxlength="100" class="input-mini" />
 			</div>
 		</div>
 		<div class="form-actions">
-			<shiro:hasPermission name="tm:registration:searchTm">
-				<input id="btnSearch" class="btn btn-primary" onclick="searchTm();"
-					value="查询相似商标" />&nbsp;</shiro:hasPermission>
 			<shiro:hasPermission name="tm:registration:edit">
 				<input id="btnSubmit" class="btn btn-primary" type="submit"
 					value="保 存" />&nbsp;</shiro:hasPermission>

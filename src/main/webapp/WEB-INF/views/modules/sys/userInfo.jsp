@@ -41,6 +41,13 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">微信二维码:</label>
+			<div class="controls">
+				<form:hidden id="wxImage" path="wxQrCode" htmlEscape="false" maxlength="255" class="input-xlarge"/>
+				<sys:ckfinder input="wxImage" type="images" uploadPath="/photo" selectMultiple="false" maxWidth="100" maxHeight="100"/>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">归属公司:</label>
 			<div class="controls">
 				<label class="lbl">${user.company.name}</label>

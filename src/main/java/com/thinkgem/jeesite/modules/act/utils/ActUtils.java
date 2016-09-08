@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.activiti.engine.impl.persistence.entity.GroupEntity;
 import org.activiti.engine.impl.persistence.entity.UserEntity;
@@ -19,7 +20,6 @@ import com.google.common.collect.Maps;
 import com.thinkgem.jeesite.common.annotation.FieldName;
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.utils.Encodes;
-import com.thinkgem.jeesite.common.utils.ObjectUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.act.entity.Act;
 import com.thinkgem.jeesite.modules.sys.entity.Role;
@@ -97,10 +97,10 @@ public class ActUtils {
 					if (m.getName().equals("getAct")){
 						Object act = m.invoke(entity, new Object[]{});
 						Method actMet = act.getClass().getMethod("getTaskId");
-						map.put("taskId", ObjectUtils.toString(m.invoke(act, new Object[]{}), ""));
+						map.put("taskId", Objects.toString(m.invoke(act, new Object[]{}), ""));
 					}else{
 						field.add(StringUtils.uncapitalize(m.getName().substring(3)));
-						value.add(ObjectUtils.toString(m.invoke(entity, new Object[]{}), ""));
+						value.add(Objects.toString(m.invoke(entity, new Object[]{}), ""));
 					}
 				}
 			}

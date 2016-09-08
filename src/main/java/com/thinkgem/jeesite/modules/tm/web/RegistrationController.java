@@ -3,11 +3,14 @@
  */
 package com.thinkgem.jeesite.modules.tm.web;
 
-import java.io.File;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.Page;
+import com.thinkgem.jeesite.common.utils.FileUtils;
+import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.tm.TmResult;
+import com.thinkgem.jeesite.common.web.BaseController;
+import com.thinkgem.jeesite.modules.tm.entity.Registration;
+import com.thinkgem.jeesite.modules.tm.service.RegistrationService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,14 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
-import com.thinkgem.jeesite.common.web.BaseController;
-import com.thinkgem.jeesite.common.utils.FileUtils;
-import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.common.utils.tm.TmResult;
-import com.thinkgem.jeesite.modules.tm.entity.Registration;
-import com.thinkgem.jeesite.modules.tm.service.RegistrationService;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 
 /**
  * 商标注册评估Controller
@@ -90,8 +88,8 @@ public class RegistrationController extends BaseController {
 	@RequiresPermissions("tm:registration:searchTm")
 	@ResponseBody
 	@RequestMapping(value = "searchTm")
-	public TmResult searchTm(String intCls, String searchKey) throws Exception {
-		TmResult result = registrationService.searchTm(intCls, searchKey);
+	public TmResult searchTm(String st, String sc, String intCls, String searchKey) throws Exception {
+		TmResult result = registrationService.searchTm(st, sc, intCls, searchKey);
 		return result;
 	}
 
@@ -99,7 +97,7 @@ public class RegistrationController extends BaseController {
 	@RequestMapping(value = "generateReports")
 	public String generateReports(Registration registration, RedirectAttributes redirectAttributes) {
 		int result = 0;
-		
+
 		try {
 			result = registrationService.generateReports(registration);
 		} catch (Exception e) {
@@ -107,11 +105,11 @@ public class RegistrationController extends BaseController {
 			e.printStackTrace();
 			result = 10;
 		}
-		
+
 		if (result == 0) {
 			addMessage(redirectAttributes, "生成商标评估报告成功");
 		} else if (result == 2) {
-			addMessage(redirectAttributes, "生成商标评估报告失败，请先上传个人头像，宽高比例3:4，其他比例造成面部扭曲后果自负");
+			addMessage(redirectAttributes, "生成商标评估报告失败，请先上传个人头像和微信二维码");
 		} else if (result == 3) {
 			addMessage(redirectAttributes, "生成商标评估报告失败，请完善商标注册主体信息");
 		} else if (result == 4) {

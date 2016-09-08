@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.thinkgem.jeesite</groupId>
-	<artifactId>jeesite</artifactId>
+	<groupId>com.epwk.report-epbiao</groupId>
+	<artifactId>report-epbiao</artifactId>
 	<version>1.2.7</version>
 	<packaging>war</packaging>
 
-	<name>JeeSite</name>
-	<url>http://thinkgem.github.com/jeesite</url>
+	<name>report-epbiao</name>
+	<url>report.epbiao.com:8999</url>
 	<inceptionYear>2012-2016</inceptionYear>
 
 	<!-- 项目属性 -->
@@ -48,9 +48,9 @@
 		<mssql.driver.version>1.3.1</mssql.driver.version>
 
 		<!-- environment setting -->
-		<jdk.version>1.6</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		<tomcat.version>2.2</tomcat.version>
-		<jetty.version>7.6.14.v20131031</jetty.version>
+		<jetty.version>9.4.0.M1</jetty.version>
 		<webserver.port>80</webserver.port>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<downloadSources>true</downloadSources>
@@ -570,11 +570,6 @@
 			<artifactId>UserAgentUtils</artifactId>
 			<version>1.13</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>${poi.version}</version>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
 		<dependency>
@@ -750,26 +745,24 @@
 				</configuration>
 			</plugin>
 
-			<!-- jetty插件 -->
+			<!-- jetty插件 <plugin> <groupId>org.eclipse.jetty</groupId> <artifactId>jetty-maven-plugin</artifactId> 
+				<version>${jetty.version}</version> <configuration> <connectors> <connector 
+				implementation="org.eclipse.jetty.server.nio.SelectChannelConnector"> <port>${webserver.port}</port> 
+				</connector> </connectors> <webAppConfig> <contextPath>/</contextPath> </webAppConfig> 
+				<systemProperties> <systemProperty> <name>org.mortbay.util.URI.charset</name> 
+				<value>${project.build.sourceEncoding}</value> </systemProperty> </systemProperties> 
+				</configuration> </plugin> -->
+
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
+				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>${jetty.version}</version>
 				<configuration>
-					<connectors>
-						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-							<port>${webserver.port}</port>
-						</connector>
-					</connectors>
-					<webAppConfig>
+					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<webApp>
 						<contextPath>/</contextPath>
-					</webAppConfig>
-					<systemProperties>
-						<systemProperty>
-							<name>org.mortbay.util.URI.charset</name>
-							<value>${project.build.sourceEncoding}</value>
-						</systemProperty>
-					</systemProperties>
+					</webApp>
+					<jettyXml>${project.basedir}/src/main/resources/jetty.xml</jettyXml>
 				</configuration>
 			</plugin>
 

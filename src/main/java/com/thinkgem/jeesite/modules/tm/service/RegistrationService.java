@@ -3,15 +3,6 @@
  */
 package com.thinkgem.jeesite.modules.tm.service;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.io.File;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
@@ -21,13 +12,20 @@ import com.thinkgem.jeesite.common.utils.ImageUtils;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.utils.tm.TmKooUtils;
 import com.thinkgem.jeesite.common.utils.tm.TmResult;
-import com.thinkgem.jeesite.modules.tm.entity.Registration;
 import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.sys.utils.UserUtils;
 import com.thinkgem.jeesite.modules.tm.dao.RegistrationDao;
-import com.thinkgem.jeesite.modules.tm.entity.Similar;
 import com.thinkgem.jeesite.modules.tm.dao.SimilarDao;
+import com.thinkgem.jeesite.modules.tm.entity.Registration;
+import com.thinkgem.jeesite.modules.tm.entity.Similar;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.awt.*;
+import java.io.File;
+import java.util.List;
 
 /**
  * 商标注册评估Service
@@ -90,8 +88,8 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 		similarDao.delete(new Similar(registration));
 	}
 
-	public TmResult searchTm(String intCls, String searchKey) throws Exception {
-		TmResult result = TmKooUtils.doSearch("1", intCls, searchKey);
+	public TmResult searchTm(String st, String sc, String intCls, String searchKey) throws Exception {
+		TmResult result = TmKooUtils.doSimilar(st, sc, intCls, searchKey);
 		return result;
 	}
 
@@ -108,16 +106,19 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 		pdfPath = FileUtils.path(pdfPath);
 		FileUtils.createDirectory(savePath);
 		FileUtils.createDirectory(pdfPath);
-		
-		System.out.println("templatePath:"+templatePath);
-		System.out.println("savePath:"+savePath);
-		System.out.println("pdfPath:"+pdfPath);
+
+		System.out.println("templatePath:" + templatePath);
+		System.out.println("savePath:" + savePath);
+		System.out.println("pdfPath:" + pdfPath);
 
 		Color black = Color.decode("#000000");
+		Color white = Color.decode("#ffffff");
+
 		// 1、生成首页
 		ImageUtils.pressTextWithLine("报告编号：" + reportNo, templatePath + "1.jpg", savePath + "1-large.jpg", "微软雅黑",
 				Font.PLAIN, black, 40, 0, 300, 1.0f);// 添加文字水印
-		//ImageUtils.scale(savePath + "1-large.jpg", savePath + "1.jpg", 2, false);// 缩略图
+		// ImageUtils.scale(savePath + "1-large.jpg", savePath + "1.jpg", 2,
+		// false);// 缩略图
 
 		// 2、生成销售专员信息图
 		String name = registration.getCurrentUser().getName();// 姓名
@@ -134,7 +135,8 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 
 		ImageUtils.pressSellInfo(photo, name, no, mobile, templatePath + "2.jpg", savePath + "2-large.jpg", "微软雅黑",
 				Font.PLAIN, black, 40);// 添加文字和图片水印
-		//ImageUtils.scale(savePath + "2-large.jpg", savePath + "2.jpg", 2, false);// 缩略图
+		// ImageUtils.scale(savePath + "2-large.jpg", savePath + "2.jpg", 2,
+		// false);// 缩略图
 
 		// 3、生成注册主体信息图
 		String applicantCn = registration.getApplicantCn();
@@ -154,7 +156,8 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 
 		ImageUtils.pressMainInfo(tmImg, applicantCn, businessType, tmName, templatePath + "3.jpg",
 				savePath + "3-large.jpg", "微软雅黑", Font.PLAIN, black, 40);// 添加文字和图片水印
-		//ImageUtils.scale(savePath + "3-large.jpg", savePath + "3.jpg", 2, false);// 缩略图
+		// ImageUtils.scale(savePath + "3-large.jpg", savePath + "3.jpg", 2,
+		// false);// 缩略图
 
 		// 4、生成相似商标区分左页图
 		int i = 4;
@@ -182,7 +185,7 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 
 				// 校验相似商标信息
 				if (sSimilarity == null || sSimilarity.equals("") || sAdvise == null || sAdvise.equals("")) {
-					return 4;
+					continue;
 				}
 
 				String tempImg = "4-left.jpg";
@@ -191,24 +194,42 @@ public class RegistrationService extends CrudService<RegistrationDao, Registrati
 				}
 				ImageUtils.pressSimilarInfo(sTmImg, sTmName, sCls, sRegNoAndStatus, sApplicantCn, sSimilarity, sAdvise,
 						templatePath + tempImg, savePath + i + "-large.jpg");// 添加文字和图片水印
-				//ImageUtils.scale(savePath + i + "-large.jpg", savePath + i + ".jpg", 2, false);// 缩略图
+				// ImageUtils.scale(savePath + i + "-large.jpg", savePath + i +
+				// ".jpg", 2, false);// 缩略图
 				i++;
 			}
 
 		}
+		
+		//若没有找到相似商标
+		if(i == 4){
+			FileUtils.copyFile(templatePath + "5.jpg", savePath + "4-large.jpg");
+			System.out.println("没有找到相似商标");
+			i++;
+		}
 
 		// 5、生成商标注册建议方案图
-		String safe = registration.getSafe();
-		String balance = registration.getBalance();
-		String radical = registration.getRadical();
-
-		ImageUtils.pressAdviseInfo(safe, balance, radical, templatePath + "5.jpg", savePath + i + "-large.jpg", 25);// 添加文字水印
-		//ImageUtils.scale(savePath + i + "-large.jpg", savePath + i + ".jpg", 2, false);// 缩略图
+		String tempImg = "6-left.jpg";
+		if (i % 2 == 1) {
+			tempImg = "6-right.jpg";
+		}
+		ImageUtils.pressAdviseInfo(registration, templatePath + tempImg, savePath + i + "-large.jpg", 25);// 添加文字水印
+		// ImageUtils.scale(savePath + i + "-large.jpg", savePath + i + ".jpg",
+		// 2, false);// 缩略图
 		i++;
 
 		// 6、尾页
-		//FileUtils.copyFile(templatePath + "6.jpg", savePath + i + ".jpg");
-		FileUtils.copyFile(templatePath + "6-large.jpg", savePath + i + "-large.jpg");
+		// FileUtils.copyFile(templatePath + "6.jpg", savePath + i +
+		// "-large.jpg");
+		// 校验是否上传头像
+		String wxQrCode = registration.getCurrentUser().getWxQrCode();
+		if (wxQrCode == null || wxQrCode.equals("")) {
+			return 2;
+		}
+		wxQrCode = FileUtils.path(Global.getUserfilesBaseDir() + wxQrCode);
+
+		ImageUtils.pressWxQr(wxQrCode, "商标顾问："+name, templatePath + "7.jpg", savePath + i + "-large.jpg", "微软雅黑",
+				Font.PLAIN, white, 30);// 添加文字和图片水印
 
 		// 7、生成pdf
 		try {

@@ -75,6 +75,7 @@
 		a.remarks,
 		a.login_flag,
 		a.photo,
+		a.wx_qr_code,
 		a.create_by AS "createBy.id",
 		a.create_date,
 		a.update_by AS "updateBy.id",
@@ -244,6 +245,7 @@
 			remarks, 
 			login_flag, 
 			photo, 
+			wx_qr_code,
 			del_flag
 		) VALUES (
 			#{id}, 
@@ -264,6 +266,7 @@
 			#{remarks}, 
 			#{loginFlag}, 
 			#{photo}, 
+			#{wxQrCode},
 			#{delFlag}
 		)
 	</insert>
@@ -286,6 +289,7 @@
 			remarks = #{remarks},
 			login_flag = #{loginFlag},
 			photo = #{photo}
+			wx_qr_code = #{wxQrCode}
 		WHERE id = #{id}
 	</update>
 	
@@ -314,7 +318,8 @@
 			update_by = #{updateBy.id}, 
 			update_date = #{updateDate}, 
 			remarks = #{remarks},
-			photo = #{photo}
+			photo = #{photo},
+			wx_qr_code = #{wxQrCode}
 		WHERE id = #{id}
 	</update>
 	

@@ -3,13 +3,12 @@
  */
 package com.thinkgem.jeesite.modules.tm.entity;
 
+import com.google.common.collect.Lists;
+import com.thinkgem.jeesite.common.persistence.DataEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
-import com.google.common.collect.Lists;
-
-import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * 商标注册评估Entity
@@ -29,68 +28,116 @@ public class Registration extends DataEntity<Registration> {
 	private String genTimes; // 报告生成次数
 	private String tmImg; // 期望商标图形
 	private String reportImg;// 报告图片
-	
-	private String safe; // 稳健型注册
-	private String balance; // 平衡型注册
-	private String radical; // 激进型注册
+
+	private String recNormal; // 推荐普通注册
+	private String recUrgent; // 推荐加急注册
+	private int recNormalTotalPrice;// 推荐普通注册总价
+	private String recNormalDiscountPrice;// 推荐普通注册优惠价
+	private int recUrgentTotalPrice;// 推荐加急注册总价
+	private String recUrgentDiscountPrice;// 推荐加急注册优惠价
+	private String extNormal; // 扩展普通注册
+	private String extUrgent; // 扩展加急注册
+	private int extNormalTotalPrice;// 拓展普通注册总价
+	private String extNormalDiscountPrice;// 拓展普通注册优惠价
+	private int extUrgentTotalPrice;// 拓展加急注册总价
+	private String extUrgentDiscountPrice;// 拓展加急注册优惠价
+
+	private String tmSt = "1";// 查询类型
+	private String tmSc = "1,2,3,4,5,10";// 查询条件
 	private int pages;
 
 	private List<Similar> similarList = Lists.newArrayList(); // 子表列表
 
-	public List<String> getSafeList() {
+	public List<String> getTmScList() {
 		List<String> list = Lists.newArrayList();
-		if (safe != null) {
-			for (String s : StringUtils.split(safe, ",")) {
+		if (tmSc != null) {
+			for (String s : StringUtils.split(tmSc, ",")) {
+				list.add(s);
+			}
+		}
+		return list;
+	}
+	
+	public void setTmScList(List<String> tmScList) {
+		if (tmScList != null && tmScList.size() > 0) {
+			this.tmSc = tmScList.toString().replace(" ", "").replace("[", "").replace("]", "");
+		} else {
+			this.tmSc = "";
+		}
+	}
+
+	public List<String> getRecNormalList() {
+		List<String> list = Lists.newArrayList();
+		if (recNormal != null) {
+			for (String s : StringUtils.split(recNormal, ",")) {
 				list.add(s);
 			}
 		}
 		return list;
 	}
 
-	public void setSafeList(List<String> safeList) {
-		if (safeList != null && safeList.size() > 0) {
-			this.safe = safeList.toString().replace(" ", "").replace("[", "").replace("]", "");
+	public void setRecNormalList(List<String> recNormalList) {
+		if (recNormalList != null && recNormalList.size() > 0) {
+			this.recNormal = recNormalList.toString().replace(" ", "").replace("[", "").replace("]", "");
 		} else {
-			this.safe = "";
+			this.recNormal = "";
 		}
 	}
-	
-	public List<String> getBalanceList() {
+
+	public List<String> getRecUrgentList() {
 		List<String> list = Lists.newArrayList();
-		if (balance != null) {
-			for (String s : StringUtils.split(balance, ",")) {
+		if (recUrgent != null) {
+			for (String s : StringUtils.split(recUrgent, ",")) {
 				list.add(s);
 			}
 		}
 		return list;
 	}
 
-	public void setBalanceList(List<String> balanceList) {
-		if (balanceList != null && balanceList.size() > 0) {
-			this.balance = balanceList.toString().replace(" ", "").replace("[", "").replace("]", "");
+	public void setRecUrgentList(List<String> recUrgentList) {
+		if (recUrgentList != null && recUrgentList.size() > 0) {
+			this.recUrgent = recUrgentList.toString().replace(" ", "").replace("[", "").replace("]", "");
 		} else {
-			this.balance = "";
+			this.recUrgent = "";
 		}
 	}
-	
-	public List<String> getRadicalList() {
+
+	public List<String> getExtNormalList() {
 		List<String> list = Lists.newArrayList();
-		if (radical != null) {
-			for (String s : StringUtils.split(radical, ",")) {
+		if (extNormal != null) {
+			for (String s : StringUtils.split(extNormal, ",")) {
 				list.add(s);
 			}
 		}
 		return list;
 	}
 
-	public void setRadicalList(List<String> radicalList) {
-		if (radicalList != null && radicalList.size() > 0) {
-			this.radical = radicalList.toString().replace(" ", "").replace("[", "").replace("]", "");
+	public void setExtNormalList(List<String> extNormalList) {
+		if (extNormalList != null && extNormalList.size() > 0) {
+			this.extNormal = extNormalList.toString().replace(" ", "").replace("[", "").replace("]", "");
 		} else {
-			this.radical = "";
+			this.extNormal = "";
 		}
 	}
-	
+
+	public List<String> getExtUrgentList() {
+		List<String> list = Lists.newArrayList();
+		if (extUrgent != null) {
+			for (String s : StringUtils.split(extUrgent, ",")) {
+				list.add(s);
+			}
+		}
+		return list;
+	}
+
+	public void setExtUrgentList(List<String> extUrgentList) {
+		if (extUrgentList != null && extUrgentList.size() > 0) {
+			this.extUrgent = extUrgentList.toString().replace(" ", "").replace("[", "").replace("]", "");
+		} else {
+			this.extUrgent = "";
+		}
+	}
+
 	public List<String> getBusinessTypeList() {
 		List<String> list = Lists.newArrayList();
 		if (businessType != null) {
@@ -209,34 +256,7 @@ public class Registration extends DataEntity<Registration> {
 	public void setReportImg(String reportImg) {
 		this.reportImg = reportImg;
 	}
-	
-	@Length(min=1, max=64, message="请选择稳健型注册类别")
-	public String getSafe() {
-		return safe;
-	}
 
-	public void setSafe(String safe) {
-		this.safe = safe;
-	}
-
-	@Length(min=1, max=64, message="请选择平衡型注册类别")
-	public String getBalance() {
-		return balance;
-	}
-
-	public void setBalance(String balance) {
-		this.balance = balance;
-	}
-
-	@Length(min=1, max=64, message="请选择冲击型注册类别")
-	public String getRadical() {
-		return radical;
-	}
-
-	public void setRadical(String radical) {
-		this.radical = radical;
-	}
-	
 	public int getPages() {
 		return pages;
 	}
@@ -244,4 +264,118 @@ public class Registration extends DataEntity<Registration> {
 	public void setPages(int pages) {
 		this.pages = pages;
 	}
+
+	public String getTmSt() {
+		return tmSt;
+	}
+
+	public void setTmSt(String tmSt) {
+		this.tmSt = tmSt;
+	}
+
+	public String getTmSc() {
+		return tmSc;
+	}
+
+	public void setTmSc(String tmSc) {
+		this.tmSc = tmSc;
+	}
+
+	public String getRecNormal() {
+		return recNormal;
+	}
+
+	public void setRecNormal(String recNormal) {
+		this.recNormal = recNormal;
+	}
+
+	public String getRecUrgent() {
+		return recUrgent;
+	}
+
+	public void setRecUrgent(String recUrgent) {
+		this.recUrgent = recUrgent;
+	}
+
+	public Integer getRecNormalTotalPrice() {
+		return recNormalTotalPrice;
+	}
+
+	public void setRecNormalTotalPrice(int recNormalTotalPrice) {
+		this.recNormalTotalPrice = recNormalTotalPrice;
+	}
+
+	public String getRecNormalDiscountPrice() {
+		return recNormalDiscountPrice;
+	}
+
+	public void setRecNormalDiscountPrice(String recNormalDiscountPrice) {
+		this.recNormalDiscountPrice = recNormalDiscountPrice;
+	}
+
+	public Integer getRecUrgentTotalPrice() {
+		return recUrgentTotalPrice;
+	}
+
+	public void setRecUrgentTotalPrice(int recUrgentTotalPrice) {
+		this.recUrgentTotalPrice = recUrgentTotalPrice;
+	}
+
+	public String getRecUrgentDiscountPrice() {
+		return recUrgentDiscountPrice;
+	}
+
+	public void setRecUrgentDiscountPrice(String recUrgentDiscountPrice) {
+		this.recUrgentDiscountPrice = recUrgentDiscountPrice;
+	}
+
+	public String getExtNormal() {
+		return extNormal;
+	}
+
+	public void setExtNormal(String extNormal) {
+		this.extNormal = extNormal;
+	}
+
+	public String getExtUrgent() {
+		return extUrgent;
+	}
+
+	public void setExtUrgent(String extUrgent) {
+		this.extUrgent = extUrgent;
+	}
+
+	public Integer getExtNormalTotalPrice() {
+		return extNormalTotalPrice;
+	}
+
+	public void setExtNormalTotalPrice(int extNormalTotalPrice) {
+		this.extNormalTotalPrice = extNormalTotalPrice;
+	}
+
+	public String getExtNormalDiscountPrice() {
+		return extNormalDiscountPrice;
+	}
+
+	public void setExtNormalDiscountPrice(String extNormalDiscountPrice) {
+		this.extNormalDiscountPrice = extNormalDiscountPrice;
+	}
+
+	public Integer getExtUrgentTotalPrice() {
+		return extUrgentTotalPrice;
+	}
+
+	public void setExtUrgentTotalPrice(int extUrgentTotalPrice) {
+		this.extUrgentTotalPrice = extUrgentTotalPrice;
+	}
+
+	public String getExtUrgentDiscountPrice() {
+		return extUrgentDiscountPrice;
+	}
+
+	public void setExtUrgentDiscountPrice(String extUrgentDiscountPrice) {
+		this.extUrgentDiscountPrice = extUrgentDiscountPrice;
+	}
+
+	
 }
